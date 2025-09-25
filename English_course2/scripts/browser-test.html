@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .link-button {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .link-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teacher Dashboard Test</h1>
+        
+        <div class="test-section info">
+            <h3>Quick Links</h3>
+            <a href="http://localhost:3000/auth/signin" class="link-button" target="_blank">
+                🔐 Login Page
+            </a>
+            <a href="http://localhost:3000/teacher/dashboard" class="link-button" target="_blank">
+                📊 Teacher Dashboard
+            </a>
+            <a href="http://localhost:3000/api/auth/session" class="link-button" target="_blank">
+                👤 Check Session
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Instructions</h3>
+            <ol>
+                <li><strong>Login Test:</strong> Click "Login Page" and login with:
+                    <ul>
+                        <li>Email: <code>teacher.a@example.com</code></li>
+                        <li>Password: <code>teacher123</code></li>
+                    </ul>
+                </li>
+                <li><strong>Dashboard Test:</strong> After login, you should be redirected to the teacher dashboard</li>
+                <li><strong>Expected Results:</strong>
+                    <ul>
+                        <li>✅ Login should redirect to <code>/teacher/dashboard</code></li>
+                        <li>✅ Dashboard should show teacher's classes</li>
+                        <li>✅ Dashboard should show schedule for the week</li>
+                        <li>✅ No "Unknown column" database errors</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>API Tests</h3>
+            <button onclick="testSession()">Test Session</button>
+            <button onclick="testDashboardAPI()">Test Dashboard API</button>
+            <button onclick="testCSRF()">Test CSRF Token</button>
+            <div id="apiResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Working Credentials</h3>
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Expected Redirect</th>
+                </tr>
+                <tr>
+                    <td>admin@example.com</td>
+                    <td>admin123</td>
+                    <td>admin</td>
+                    <td>/admin</td>
+                </tr>
+                <tr>
+                    <td>teacher.a@example.com</td>
+                    <td>teacher123</td>
+                    <td>teacher</td>
+                    <td>/teacher/dashboard</td>
+                </tr>
+                <tr>
+                    <td>teacher.b@example.com</td>
+                    <td>teacher123</td>
+                    <td>teacher</td>
+                    <td>/teacher/dashboard</td>
+                </tr>
+                <tr>
+                    <td>student.c@example.com</td>
+                    <td>student123</td>
+                    <td>student</td>
+                    <td>/student/dashboard</td>
+                </tr>
+                <tr>
+                    <td>student.d@example.com</td>
+                    <td>student123</td>
+                    <td>student</td>
+                    <td>/student/dashboard</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function testSession() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<p>Testing session...</p>';
+            
+            try {
+                const response = await fetch('/api/auth/session');
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-section ${data.user ? 'success' : 'info'}">
+                        <h4>Session Test Results</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-section error">
+                        <h4>Session Test Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testDashboardAPI() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<p>Testing dashboard API...</p>';
+            
+            try {
+                const response = await fetch('/api/teacher/dashboard');
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-section ${response.ok ? 'success' : 'error'}">
+                        <h4>Dashboard API Test Results (Status: ${response.status})</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-section error">
+                        <h4>Dashboard API Test Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testCSRF() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<p>Testing CSRF token...</p>';
+            
+            try {
+                const response = await fetch('/api/auth/csrf');
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-section ${data.csrfToken ? 'success' : 'error'}">
+                        <h4>CSRF Test Results</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-section error">
+                        <h4>CSRF Test Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
