@@ -1,5 +1,0 @@
-export { HeroSection } from './hero-section'
-export { MissionSection } from './mission-section'
-export { FacultySection } from './faculty-section'
-export { CoursesSection } from './courses-section'
-export { TestimonialsSection } from './testimonials-section'
